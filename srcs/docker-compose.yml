@@ -6,10 +6,32 @@ services:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
     environment:
-      - MYSQL_ROOT_PASSWORD_FILE=../../../secrets/db_password.txt
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_password.txt
       - TZ=Africa/Casablanca
     volumes:
-      - mariadb_v:/Users/hichamessaquy/Desktop/inception/srcs/requirements/mariadb/tools/mariadb_v
+      - mariadb_v:/var/lib/mysql
+      - ../secrets/db_password.txt:/run/secrets/db_password.txt:ro
+    networks:
+      - inception
+  
+  php-wordpress:
+    image: php-wordpress
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    volumes: 
+      - wordpress_v:/var/www/html/wp-content
+      - ../secrets/db_password.txt:/run/secrets/db_password.txt:ro
+    environment:
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_NAME=mariadb
+      - WORDPRESS_DB_USER=root
+      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/db_password.txt
+    networks:
+      - inception
 
 volumes:
   mariadb_v:
+  wordpress_v:
+networks:
+  inception:
