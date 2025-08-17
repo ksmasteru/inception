@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  mariadb:
+    image: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=../../../secrets/db_password.txt
+      - TZ=Africa/Casablanca
+    volumes:
+      - mariadb_v:/Users/hichamessaquy/Desktop/inception/srcs/requirements/mariadb/tools/mariadb_v
+
+volumes:
+  mariadb_v:
