@@ -1,7 +1,7 @@
 #BASE IMAGE FOR NGINX
 
-FROM nginx:debian-alpine
+FROM nginx:latest
 
-RUN apt-get update && apt-get install -y \
+#start nginx
 
-
+CMD ["nginx", "-g", "daemon off;"]
