@@ -3,7 +3,7 @@ volumes:
     driver: local
     driver_opts:
       type: "bind"
-      device: /home/aelbasri/data/wordpress_files
+      device: /home/data/wordpress_files
       o: "bind"
     name: wordpress
 
@@ -11,7 +11,7 @@ volumes:
     driver: local
     driver_opts:
         type: "bind"
-        device: /home/aelbasri/data/wordpress_database
+        device: /home/data/wordpress_database
         o: "bind"
     name: database
 
@@ -22,7 +22,7 @@ services:
     ports: 
       - "443:443"
     build: ./requirements/nginx/
-    env_file: ./.env
+    env_file: .env
     restart: always
     volumes:
       - wordpress:/var/www/html/
@@ -33,7 +33,7 @@ services:
     container_name: wordpress
     image: wordpress:1337
     build: ./requirements/wordpress/
-    env_file: ./.env
+    env_file: .env
     restart: always
     volumes:
       - wordpress:/var/www/html/
@@ -43,57 +43,12 @@ services:
     container_name: mariadb
     image: mariadb:1337
     build: ./requirements/mariadb/
-    env_file: ./.env
+    env_file: .env
     restart: always
     volumes:
       - database:/var/lib/mysql 
     networks:
       - docker-network
-
-  redis:
-    container_name: redis
-    image: redis:1337
-    build: ./requirements/bonus/redis
-    env_file: ./.env
-    restart: always
-    networks:
-      - docker-network
-
-  ftp:
-    container_name: ftp
-    image: ftp:1337
-    build: ./requirements/bonus/ftp
-    env_file: ./.env
-    restart: always
-    volumes:
-      - wordpress:/srv/ftp/user1/ 
-    networks:
-      - docker-network
-
-  portfolio:
-    container_name: portfolio
-    image: portfolio:1337
-    build: ./requirements/bonus/portfolio
-    restart: always
-    networks:
-      - docker-network 
-
-  adminer:
-    container_name: adminer
-    image: adminer:1337
-    build: ./requirements/bonus/adminer
-    restart: always
-    networks:
-      - docker-network 
-
-  netdata:
-    container_name: netdata
-    image: netdata:1337
-    build: ./requirements/bonus/netdata
-    restart: always
-    networks:
-      - docker-network 
-
 networks:
   docker-network:
     driver: bridge
