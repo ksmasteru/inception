@@ -1,54 +1,99 @@
-version: '3.8'
-services:
-  mariadb:
-    image: mariadb
-    build:
-      context: ./requirements/mariadb
-      dockerfile: Dockerfile
-    environment:
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_password.txt
-      - TZ=Africa/Casablanca
-    volumes:
-      - mariadb_v:/var/lib/mysql
-      - ../secrets/db_password.txt:/run/secrets/db_password.txt:ro
-    networks:
-      - inception
-  
+volumes:  
   wordpress:
-    image: wordpress
-    build:
-      context: ./requirements/wordpress
-      dockerfile: Dockerfile
-    volumes:
-      - wordpress_v:/var/www/html
-      - ../secrets/db_password.txt:/run/secrets/db_password.txt:ro
-      - ./requirements/nginx/conf/ssl/certs/wordpress.crt:/etc/ssl/certs/wordpress.crt:ro
-      - ./requirements/nginx/conf/ssl/private/wordpress.key:/etc/ssl/private/wordpress.key:ro
-    environment:
-      - WORDPRESS_DB_HOST=mariadb:3306
-      - WORDPRESS_DB_NAME=mariadb
-      - WORDPRESS_DB_USER=root
-      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/db_password.txt
-    networks:
-      - inception
+    driver: local
+    driver_opts:
+      type: "bind"
+      device: /home/aelbasri/data/wordpress_files
+      o: "bind"
+    name: wordpress
 
+  database:
+    driver: local
+    driver_opts:
+        type: "bind"
+        device: /home/aelbasri/data/wordpress_database
+        o: "bind"
+    name: database
+
+services:
   nginx:
-    image: nginx
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
+    container_name: nginx
+    image: nginx:1337
+    ports: 
+      - "443:443"
+    build: ./requirements/nginx/
+    env_file: ./.env
+    restart: always
     volumes:
-      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./requirements/nginx/conf/ssl/certs/wordpress.crt:/etc/ssl/certs/wordpress.crt:ro	
-      - ./requirements/nginx/conf/ssl/private/wordpress.key:/etc/ssl/private/wordpress.key:ro
-      - wordpress_v:/var/www/html:ro
+      - wordpress:/var/www/html/
     networks:
-      - inception
-    ports:
-      - "6969:6969"
+      - docker-network
 
-volumes:
-  mariadb_v:
-  wordpress_v:
+  wordpress:
+    container_name: wordpress
+    image: wordpress:1337
+    build: ./requirements/wordpress/
+    env_file: ./.env
+    restart: always
+    volumes:
+      - wordpress:/var/www/html/
+    networks:
+      - docker-network
+  mariadb:
+    container_name: mariadb
+    image: mariadb:1337
+    build: ./requirements/mariadb/
+    env_file: ./.env
+    restart: always
+    volumes:
+      - database:/var/lib/mysql 
+    networks:
+      - docker-network
+
+  redis:
+    container_name: redis
+    image: redis:1337
+    build: ./requirements/bonus/redis
+    env_file: ./.env
+    restart: always
+    networks:
+      - docker-network
+
+  ftp:
+    container_name: ftp
+    image: ftp:1337
+    build: ./requirements/bonus/ftp
+    env_file: ./.env
+    restart: always
+    volumes:
+      - wordpress:/srv/ftp/user1/ 
+    networks:
+      - docker-network
+
+  portfolio:
+    container_name: portfolio
+    image: portfolio:1337
+    build: ./requirements/bonus/portfolio
+    restart: always
+    networks:
+      - docker-network 
+
+  adminer:
+    container_name: adminer
+    image: adminer:1337
+    build: ./requirements/bonus/adminer
+    restart: always
+    networks:
+      - docker-network 
+
+  netdata:
+    container_name: netdata
+    image: netdata:1337
+    build: ./requirements/bonus/netdata
+    restart: always
+    networks:
+      - docker-network 
+
 networks:
-  inception:
+  docker-network:
+    driver: bridge

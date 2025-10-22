@@ -1,16 +1,17 @@
-#idocker file for mariadb
-#
-FROM debian:bullseye
-  
-RUN 	apt-get update && \  	
- 	apt-get install -y \
-	mariadb-server
+FROM debian:bookworm-backports
 
-COPY ./conf/mariadb_init.sh /tmp/mariadb_init.sh
+RUN apt update &&\
+    apt-get install -y mariadb-server 
 
-RUN chmod +x /tmp/mariadb_init.sh
+RUN apt install -y  vim &&\
+    apt install -y sudo 
 
-#running script that set up mariadb and run the daemon
-RUN sh /tmp/mariadb_init.sh
+COPY ./config/my.cnf /etc/mysql/my.cnf 
+COPY ./config/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf 
 
-CMD ["mysql_safe"]
+COPY ./tools/setup.sh . 
+
+RUN chmod +x setup.sh
+
+CMD ["bash", "setup.sh"]
+
