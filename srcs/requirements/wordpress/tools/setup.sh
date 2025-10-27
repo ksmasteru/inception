@@ -31,4 +31,4 @@ else
 	cp wp-config-sample.php wp-config.php
 fi
 
-exec "@a"
+exec "$@"

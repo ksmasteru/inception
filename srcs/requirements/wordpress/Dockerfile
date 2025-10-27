@@ -18,10 +18,10 @@ RUN apt update && \
 	  
 RUN sudo apt install -y php-fpm
 
-COPY ./tools/setup.sh .
+COPY ./tools/setup.sh /usr/local/bin/
 
-RUN chmod +x setup.sh 
+RUN chmod +x /usr/local/bin/setup.sh
 
-ENTRYPOINT ["setup.sh"]
+ENTRYPOINT ["/usr/local/bin/setup.sh"]
 
-CMD  ["php-fpm8.2", "-F"]
+CMD  ["/usr/sbin/php-fpm8.2", "-F"]
