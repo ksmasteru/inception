@@ -1,5 +1,5 @@
 create:
-	mkdir ~/data ~/data/wordpress_database/ ~/data/wordpress_files/ 
+	@mkdir ~/data ~/data/wordpress_database/ ~/data/wordpress_files/ 
 
 build:
 	docker compose -f ./srcs/docker-compose.yml build
