@@ -22,4 +22,6 @@ COPY ./tools/setup.sh .
 
 RUN chmod +x setup.sh 
 
-CMD  ["bash", "setup.sh"]
+ENTRYPOINT ["setup.sh"]
+
+CMD  ["php-fpm8.2", "-F"]
