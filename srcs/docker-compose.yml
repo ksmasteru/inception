@@ -1,9 +1,9 @@
-volumes:  
+volumes:
   wordpress:
     driver: local
     driver_opts:
       type: "bind"
-      device: ~/data/wordpress_files
+      device: /home/hes-saqu/data/wordpress_files
       o: "bind"
     name: wordpress
 
@@ -11,7 +11,7 @@ volumes:
     driver: local
     driver_opts:
         type: "bind"
-        device: ~/data/wordpress_database
+        device: /home/hes-saqu/data/wordpress_database
         o: "bind"
     name: database
 
