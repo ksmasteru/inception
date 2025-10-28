@@ -1,31 +1,30 @@
-#!/usr/bin/env bash
-set -e
+#!/usr/bin/bash
 
-mkdir -p /var/www/html
-cd /var/www/html
-
-if [ -f ./wp-config.php ]; then
+if [ -f ./wp-config.php ]
+then
     echo "WordPress already installed"
 else
     echo "Downloading and installing WordPress..."
 
-    wget -q -O wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-    chmod +x wp-cli.phar
-    mv wp-cli.phar /usr/local/bin/wp
+    wget http://wordpress.org/latest.tar.gz
+    tar xfz latest.tar.gz
+    mv wordpress/* .
+    rm -rf latest.tar.gz
+    rm -rf wordpress
 
-    wp core download --allow-root
-
+    sed -i "s/database_name_here/${DBNAME}/g" wp-config-sample.php
+    sed -i "s/username_here/${DBUSER}/g" wp-config-sample.php
+    sed -i "s/password_here/${DBPASS}/g" wp-config-sample.php
+    sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'mariadb:3306' );/g" wp-config-sample.php
+  
     cp wp-config-sample.php wp-config.php
-    sed -i "s/database_name_here/${DBNAME}/g" wp-config.php
-    sed -i "s/username_here/${DBUSER}/g" wp-config.php
-    sed -i "s/password_here/${DBPASS}/g" wp-config.php
-    sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'mariadb:3306' );/g" wp-config.php
-
-    echo "Waiting for database to be ready..."
-    until wp db check --allow-root >/dev/null 2>&1; do
-        sleep 2
-    done
-
+    #echo "Waiting for database to be ready..."
+    #until wp db check --allow-root >/dev/null 2>&1; do
+    #    sleep 2
+    #done
+    #echo "database ready"
+	
+    sleep 5
     wp core install --skip-email \
         --url="${DOMAIN_NAME}" \
         --title="Inception" \
@@ -40,5 +39,6 @@ else
     sed -i 's|listen = /run/php/php8.2-fpm.sock|listen = 9000|' /etc/php/8.2/fpm/pool.d/www.conf
 fi
 
-exec "$@"
+php-fpm8.2 -F
+#exec "$@
 

@@ -35,6 +35,8 @@ services:
     build: ./requirements/wordpress/
     env_file: ../secrets/.env
     restart: always
+    depends_on:
+      - mariadb
     volumes:
       - wordpress:/var/www/html/
     networks:
